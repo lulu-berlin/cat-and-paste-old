@@ -1,0 +1,114 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Cats</title>
+        <style>
+            @font-face {
+                font-family: "Gimmicky";
+                src: url("http://db.onlinewebfonts.com/t/7e75845e1b4b42b02f5b7610614f6cc3.eot");
+                src: url("http://db.onlinewebfonts.com/t/7e75845e1b4b42b02f5b7610614f6cc3.eot?#iefix") format("embedded-opentype"),
+                     url("http://db.onlinewebfonts.com/t/7e75845e1b4b42b02f5b7610614f6cc3.woff2") format("woff2"),
+                     url("http://db.onlinewebfonts.com/t/7e75845e1b4b42b02f5b7610614f6cc3.woff") format("woff"),
+                     url("http://db.onlinewebfonts.com/t/7e75845e1b4b42b02f5b7610614f6cc3.ttf") format("truetype"),
+                     url("http://db.onlinewebfonts.com/t/7e75845e1b4b42b02f5b7610614f6cc3.svg#Gimmicky") format("svg");
+            }
+            img { position: absolute; margin: auto; top: 0; left: 0; right: 0; bottom: 0; }
+            video { position: absolute; margin: auto; top: 0; left: 0; right: 0; bottom: 0; }
+            video::-webkit-media-controls { display: none; }
+            p { position: absolute; margin: auto; padding: 10px; left: 0; bottom: 0; font-size: 50%; font-family: "Gimmicky"; }
+        </style>
+    </head>
+    <body>
+        <div id="cats"></div>
+        <p>cat and paste, or the importance of effective procatination. source code <a href="">here</a>.</p>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+        <script>
+            window.onload = (function() {
+                $("#cats").append(
+                    $("<img>")
+                    .attr("id", "static-cat")
+                    .attr("src", "http://loremflickr.com/" + (innerWidth/2|0) + "/" + (innerHeight/2|0) + "/cat")
+                );
+
+                var cache_size = 5;
+                var cats = [];
+                var giphy_api_key = "dc6zaTOxFJmzC";
+
+                function giphy(search_term, func) {
+                    $.get("http://api.giphy.com/v1/gifs/random?api_key=" + giphy_api_key + "&tag=" + search_term)
+                        .done(function (result) {
+                            $.get("http://api.giphy.com/v1/gifs/" + result.data.id + "?api_key=" + giphy_api_key)
+                                .done(function (result) {
+                                    func(result.data.images.fixed_height.mp4); }); });
+                }
+
+                for (var i = 0; i < cache_size; i++) {
+                    giphy("cats", function (url) {
+                        var i = cats.length;
+                        cats.push({
+                            src: url,
+                            loaded: false
+                        });
+                        $("#cats")
+                            .append( $("<video>")
+                                    .attr("id", "cat" + i)
+                                    .attr("src", cats[i].src)
+                                    .attr("type", "video/mp4")
+                                    .on("contextmenu", function () { return false; })
+                                    .on("canplaythrough", function() {
+                                        cats[i].loaded = true;
+                                        if (cats.length == cache_size &&
+                                            cats.every(function (cat) { return cat.loaded; })) {
+                                                start_cats();
+                                        } })
+                                    .hide() );
+                    });
+                }
+
+                function start_cats() {
+                    for (var i = 0; i < cache_size; i++) { cats[i].element = $("#cat" + i); }
+
+                    var cur_cat = -1;
+
+                    function play() {
+                        if (cur_cat == -1) {
+                            var available_cat = cats.find(function (cat) { return cat.loaded; });
+                            if (available_cat) {
+                                cur_cat = cats.indexOf(available_cat);
+                                available_cat.element[0].play();
+                                available_cat.element.off('ended');
+                                available_cat.element.show();
+                                available_cat.element.on('ended', function () {
+                                    if (cur_cat != -1) { switch_cat(cur_cat); }
+                                });
+                            }
+                            else {
+                                setInterval(play, 100);
+                            }
+                        }
+                    }
+
+                    function switch_cat(i) {
+                        cats[i].element.hide();
+                        cats[i].loaded = false;
+                        cur_cat = -1;
+
+                        giphy("cats", function (url) {
+                            cats[i].src = url;
+                            cats[i].element[0].src = cats[i].src;
+                            cats[i].element.off("canplaythrough");
+                            cats[i].element[0].load();
+                            cats[i].element.on("canplaythrough", function () {
+                                cats[i].loaded = true;
+                            });
+                        });
+                        play();
+                    }
+
+                    $("#static-cat").remove();
+                    play();
+                }
+            });
+        </script>
+    </body>
+</html>
