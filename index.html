@@ -5,12 +5,12 @@
         <style>
             @font-face {
                 font-family: "Gimmicky";
-                src: url("http://db.onlinewebfonts.com/t/7e75845e1b4b42b02f5b7610614f6cc3.eot");
-                src: url("http://db.onlinewebfonts.com/t/7e75845e1b4b42b02f5b7610614f6cc3.eot?#iefix") format("embedded-opentype"),
-                     url("http://db.onlinewebfonts.com/t/7e75845e1b4b42b02f5b7610614f6cc3.woff2") format("woff2"),
-                     url("http://db.onlinewebfonts.com/t/7e75845e1b4b42b02f5b7610614f6cc3.woff") format("woff"),
-                     url("http://db.onlinewebfonts.com/t/7e75845e1b4b42b02f5b7610614f6cc3.ttf") format("truetype"),
-                     url("http://db.onlinewebfonts.com/t/7e75845e1b4b42b02f5b7610614f6cc3.svg#Gimmicky") format("svg");
+                src: url("gimmicky.eot");
+                src: url("gimmicky.eot?#iefix") format("embedded-opentype"),
+                     url("gimmicky.woff2") format("woff2"),
+                     url("gimmicky.woff") format("woff"),
+                     url("gimmicky.ttf") format("truetype"),
+                     url("gimmicky.svg#Gimmicky") format("svg");
             }
             body { zoom: 2; }
             img { position: absolute; margin: auto; top: 0; left: 0; right: 0; bottom: 0; }
@@ -97,6 +97,7 @@
                         giphy("cats", function (url) {
                             cats[i].src = url;
                             cats[i].element[0].src = cats[i].src;
+                            cats[i].element.off("click");
                             cats[i].element.off("canplaythrough");
                             cats[i].element[0].load();
                             cats[i].element.on("canplaythrough", function () { cats[i].loaded = true; });
