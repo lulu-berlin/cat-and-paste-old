@@ -99,9 +99,8 @@
                             cats[i].element[0].src = cats[i].src;
                             cats[i].element.off("canplaythrough");
                             cats[i].element[0].load();
-                            cats[i].element.on("canplaythrough", function () {
-                                cats[i].loaded = true;
-                            });
+                            cats[i].element.on("canplaythrough", function () { cats[i].loaded = true; });
+                            cats[i].element.on("click", function () { play(); });
                         });
                         play();
                     }
