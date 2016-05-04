@@ -12,22 +12,23 @@
                      url("http://db.onlinewebfonts.com/t/7e75845e1b4b42b02f5b7610614f6cc3.ttf") format("truetype"),
                      url("http://db.onlinewebfonts.com/t/7e75845e1b4b42b02f5b7610614f6cc3.svg#Gimmicky") format("svg");
             }
+            body { zoom: 2; }
             img { position: absolute; margin: auto; top: 0; left: 0; right: 0; bottom: 0; }
             video { position: absolute; margin: auto; top: 0; left: 0; right: 0; bottom: 0; }
             video::-webkit-media-controls { display: none; }
-            p { position: absolute; margin: auto; padding: 10px; left: 0; bottom: 0; font-size: 50%; font-family: "Gimmicky"; }
+            p { position: absolute; margin: auto; padding: 10px; left: 0; bottom: 0; font-family: "Gimmicky"; font-size: small; }
         </style>
     </head>
     <body>
         <div id="cats"></div>
-        <p>cat and paste, or the importance of effective procatination. source code <a href="">here</a>.</p>
+        <p>cat and paste, or the importance of effective procatination. source code <a href="https://gist.github.com/yever/e7ca43ba2f008704ca6a17cd8269e9ef">here</a>.</p>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
         <script>
             window.onload = (function() {
                 $("#cats").append(
                     $("<img>")
                     .attr("id", "static-cat")
-                    .attr("src", "http://loremflickr.com/" + (innerWidth/2|0) + "/" + (innerHeight/2|0) + "/cat")
+                    .attr("src", "http://loremflickr.com/" + (innerWidth/4|0) + "/" + (innerHeight/4|0) + "/cat")
                 );
 
                 var cache_size = 5;
