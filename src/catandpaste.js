@@ -142,7 +142,7 @@ $(function() {
     if (Modernizr.video) {
         if (Modernizr.video.mp4) {
             Modernizr.on("videoautoplay", function(videoautoplay) {
-                if (videoautplay) {
+                if (videoautoplay) {
                     startCatAndPaste("desktop");
                 } else {
                     startCatAndPaste("mobile");

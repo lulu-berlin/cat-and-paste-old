@@ -39,7 +39,12 @@ gulp.task('browserify', function() {
         .pipe(gulp.dest('out'));
 });
 
-gulp.task('bundle', ['inline-css', 'modernizr', 'browserify'], function() {
+gulp.task('copy-block', function() {
+    return gulp.src('src/.block')
+        .pipe(gulp.dest('out'));
+});
+
+gulp.task('bundle', ['inline-css', 'modernizr', 'browserify', 'copy-block'], function() {
     return gulp.src('out/index.html')
         .pipe(inlinesource())
         .pipe(gulp.dest('dist'))
