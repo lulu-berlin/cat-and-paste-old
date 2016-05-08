@@ -1,5 +1,3 @@
-@import url(http://db.onlinewebfonts.com/c/7e75845e1b4b42b02f5b7610614f6cc3?family=Gimmicky);
-
 body {
     zoom: 2;
 }
@@ -16,12 +14,12 @@ img, video {
     top: 0;
 }
 
-video::-webkit-media-controls {
+video::-webkit - media - controls {
     display: none;
 }
 
 p {
     padding: 10px;
-    font-family: 'Gimmicky';
-    font-size: xx-small;
+    font - family: 'Gimmicky';
+    font - size: xx - small;
 }

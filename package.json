@@ -20,12 +20,19 @@
   },
   "homepage": "https://github.com/yever/cat-and-paste#readme",
   "devDependencies": {
+    "browserify": "^13.0.1",
     "gulp": "^3.9.1",
-    "gulp-concat": "^2.6.0",
+    "gulp-htmlmin": "^2.0.0",
+    "gulp-inline-css": "^3.1.0",
+    "gulp-inline-source": "^2.1.0",
     "gulp-jshint": "^2.0.0",
     "gulp-modernizr": "^1.0.0-alpha",
     "gulp-rename": "^1.2.2",
     "gulp-uglify": "^1.5.3",
-    "jshint": "^2.9.2"
+    "jshint": "^2.9.2",
+    "vinyl-source-stream": "^1.1.0"
+  },
+  "dependencies": {
+    "jquery": "^2.2.3"
   }
 }
