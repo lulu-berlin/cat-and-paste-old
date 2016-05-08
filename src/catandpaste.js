@@ -1,8 +1,7 @@
+var $ = require('jquery');
 
-var CatAndPaste = function(platform) {
-    'use strict'
-
-    var $ = require('jquery');
+function startCatAndPaste(platform) {
+    'use strict';
 
     var cache_size = 5;
     var cats = [];
@@ -96,6 +95,7 @@ var CatAndPaste = function(platform) {
                                 .attr("id", "cat" + i)
                                 .attr("src", url)
                                 .attr("type", "video/mp4")
+                                .attr("style", $("#static-cat").attr("style"))
                                 .on("contextmenu",
                                     function() {
                                         return false;
@@ -129,25 +129,29 @@ var CatAndPaste = function(platform) {
             console.log("Unknown platform, cannot run.");
             break;
     }
-};
+}
 
 $(function() {
     'use strict';
 
-    $("#cats").append(
-        $("<img>")
-        .attr("id", "static-cat")
-        .attr("src", "http://loremflickr.com/" + Math.floor(innerWidth / 4) + "/" + Math.floor(innerHeight / 4) + "/cat"));
+    $("#static-cat")
+        .attr("src",
+            "http://loremflickr.com/" + Math.floor(window.innerWidth / 4) +
+            "/" + Math.floor(window.innerHeight / 4) + "/cat");
 
-    console.log("hello again");
-    console.log(Modernizr);
-    Modernizr.on("videoautoplay", function(videoautoplay) {
-        if (videoautoplay && Modernizr.video) {
-            console.log("desktop");
-            CatAndPaste("desktop");
+    if (Modernizr.video) {
+        if (Modernizr.video.mp4) {
+            Modernizr.on("videoautoplay", function(videoautoplay) {
+                if (videoautplay) {
+                    startCatAndPaste("desktop");
+                } else {
+                    startCatAndPaste("mobile");
+                }
+            });
         } else {
-            console.log("mobile");
-            CatAndPaste("mobile");
+            startCatAndPaste("mobile");
         }
-    });
+    } else {
+        console.log("No video support.");
+    }
 });

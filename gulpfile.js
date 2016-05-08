@@ -1,20 +1,13 @@
 'use strict';
+
 var gulp = require('gulp');
 
-var browserify = require('browserify');
-
 var jshint = require('gulp-jshint');
-var uglify = require('gulp-uglify');
-var rename = require('gulp-rename');
-
-var modernizr = require('gulp-modernizr');
-
-var source = require('vinyl-source-stream');
-
 var inlineCSS = require('gulp-inline-css');
-
+var modernizr = require('gulp-modernizr');
+var browserify = require('browserify');
+var source = require('vinyl-source-stream');
 var inlinesource = require('gulp-inline-source');
-
 var htmlmin = require('gulp-htmlmin');
 
 gulp.task('lint', function() {
