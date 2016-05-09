@@ -46,7 +46,7 @@ gulp.task('copy-block', function() {
 
 gulp.task('bundle', ['inline-css', 'modernizr', 'browserify', 'copy-block'], function() {
     return gulp.src('out/index.html')
-        .pipe(inlinesource())
+        .pipe(inlinesource({compress: false}))
         .pipe(gulp.dest('dist'))
         .pipe(htmlmin({
             collapseWhitespace: true,
