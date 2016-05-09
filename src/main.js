@@ -1,12 +1,8 @@
-function startCatAndPaste(mode) {
+(function() {
     'use strict';
 
-    var cache_size = 5;
-    var cats = [];
-    var giphy_api_key = 'dc6zaTOxFJmzC';
-    var giphy_search_term = 'cats';
-
-    var init;
+    var Modernizr = require('modernizr');
+    var SuperGif = require('supergif');
 
     function getJSON(url, func) {
         var request = new XMLHttpRequest();
@@ -45,16 +41,6 @@ function startCatAndPaste(mode) {
             });
     }
 
-    function giphyWEBP(func) {
-        getJSON('http://api.giphy.com/v1/gifs/random?api_key=' + giphy_api_key + '&tag=' + giphy_search_term,
-            function(result) {
-                getJSON('http://api.giphy.com/v1/gifs/' + result.data.id + '?api_key=' + giphy_api_key,
-                    function(result) {
-                        func(result.data.images.fixed_height.webp);
-                    });
-            });
-    }
-
     function giphyGIF(func) {
         getJSON('http://api.giphy.com/v1/gifs/random?api_key=' + giphy_api_key + '&tag=' + giphy_search_term,
             function(result) {
@@ -64,6 +50,11 @@ function startCatAndPaste(mode) {
                     });
             });
     }
+
+    var cache_size = 5;
+    var cats = [];
+    var giphy_api_key = 'dc6zaTOxFJmzC';
+    var giphy_search_term = 'cats';
 
     function startVideo(giphy) {
         for (var i = 0; i < cache_size; i++) {
@@ -120,96 +111,78 @@ function startCatAndPaste(mode) {
     }
 
     function initVideo(giphy, start) {
-        giphy(function(url) {
-            var i = cats.length;
+        function init() {
+            giphy(function(url) {
+                var i = cats.length;
 
-            cats.push({
-                loaded: false
-            });
-
-            var videoElement = document.createElement('video');
-            videoElement.setAttribute('id', 'cat' + i);
-            videoElement.setAttribute('src', url);
-            videoElement.setAttribute('type', 'video/mp4');
-            videoElement.setAttribute('style', document.getElementById('static-cat').getAttribute('style'));
-            videoElement.oncontextmenu =
-                function() {
-                    return false;
-                };
-            videoElement.oncanplaythrough =
-                function() {
-                    cats[i].loaded = true;
-                    if (cats.length === cache_size &&
-                        cats.every(
-                            function(cat) {
-                                return cat.loaded;
-                            })) {
-                        start(giphy);
-                    }
-                };
-            document.getElementById('cats').appendChild(videoElement);
-            document.getElementById('cat' + i).style.display = 'none';
-        });
-    }
-
-
-    switch (mode) {
-        case 'mp4':
-            init = function() {
-                initVideo(giphyMP4, startVideo);
-            };
-            break;
-
-        case 'webp':
-            init = function() {
-                initVideo(giphyWEBP, startVideo);
-            };
-            return;
-
-        case 'video-gif':
-        case 'static-gif':
-            console.log('Error: unimplemented');
-            return;
-
-        default:
-            console.log('Error: unknown format');
-            return;
-    }
-
-    for (var i = 0; i < cache_size; i++) {
-        init();
-    }
-}
-
-window.onload =
-    function() {
-        'use strict';
-
-        // remove static cat image
-        var staticCat = document.getElementById('static-cat');
-        staticCat.src =
-            'http://loremflickr.com/' + Math.floor(window.innerWidth / 4) +
-            '/' + Math.floor(window.innerHeight / 4) + '/cat';
-
-        if (Modernizr.video) {
-            Modernizr.on('videoautoplay',
-                function(videoautoplay) {
-                    if (videoautoplay) {
-                        if (Modernizr.video.h264) {
-                            startCatAndPaste('mp4');
-                        } else {
-                            Modernizr.on('webp',
-                                function(webp) {
-                                    if (webp) {
-                                        startCatAndPaste('webp');
-                                    } else {
-                                        startCatAndPaste('video-gif');
-                                    }
-                                });
-                        }
-                    }
+                cats.push({
+                    loaded: false
                 });
-        } else {
-            console.log('static-gif');
+
+                var attributes = {
+                    id: 'cat' + i,
+                    src: url,
+                    type: 'video/mp4',
+                    style: document.getElementById('static-cat').getAttribute('style')
+
+                };
+
+                var videoElement = document.createElement('video');
+
+                for (var attr in attributes) {
+                    if (attributes.hasOwnProperty(attr)) {
+                        videoElement.setAttribute(attr, attributes[attr]);
+                    }
+                }
+
+                videoElement.oncontextmenu =
+                    function() {
+                        return false;
+                    };
+
+                videoElement.oncanplaythrough =
+                    function() {
+                        cats[i].loaded = true;
+                        if (cats.length === cache_size &&
+                            cats.every(
+                                function(cat) {
+                                    return cat.loaded;
+                                })) {
+                            start(giphy);
+                        }
+                    };
+
+                document.getElementById('cats').appendChild(videoElement);
+                document.getElementById('cat' + i).style.display = 'none';
+            });
         }
-    };
+
+        for (var i = 0; i < cache_size; i++) {
+            init();
+        }
+    }
+
+    window.onload =
+        function() {
+            // remove static cat image
+            var staticCat = document.getElementById('static-cat');
+            staticCat.src =
+                'http://loremflickr.com/' + Math.floor(window.innerWidth / 4) +
+                '/' + Math.floor(window.innerHeight / 4) + '/cat';
+
+            if (Modernizr.video) {
+                Modernizr.on('videoautoplay',
+                    function(videoautoplay) {
+                        if (videoautoplay) {
+                            if (false) { //Modernizr.video.h264) {
+                                initVideo(giphyMP4, startVideo);
+                            } else {
+                                console.log('Not implemented');
+                            }
+                        }
+                    });
+            } else {
+                console.log('Not implemented');
+            }
+        };
+})();

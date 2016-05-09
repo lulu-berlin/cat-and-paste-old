@@ -5,6 +5,7 @@ var gulp = require('gulp');
 var jshint = require('gulp-jshint');
 var inlineCSS = require('gulp-inline-css');
 var modernizr = require('gulp-modernizr');
+var concat = require('gulp-concat');
 var browserify = require('browserify');
 var source = require('vinyl-source-stream');
 var inlinesource = require('gulp-inline-source');
@@ -21,7 +22,7 @@ gulp.task('inline-css', function() {
         .pipe(inlineCSS({
             removeStyleTags: false
         }))
-        .pipe(gulp.dest('out'));
+        .pipe(gulp.dest('app'));
 });
 
 gulp.task('modernizr', function() {
@@ -29,24 +30,32 @@ gulp.task('modernizr', function() {
         .pipe(modernizr({
             tests: ['videoautoplay']
         }))
-        .pipe(gulp.dest('out'));
+        .pipe(gulp.dest('lib'));
+});
+
+gulp.task('concat-libs', function() {
+    return gulp.src('lib/*.js')
+        .pipe(concat('libs.js'))
+        .pipe(gulp.dest('app/js'));
 });
 
 gulp.task('browserify', function() {
-    return browserify('src/catandpaste.js')
+    return browserify('src/main.js')
         .bundle()
-        .pipe(source('index.js'))
-        .pipe(gulp.dest('out'));
+        .pipe(source('main.js'))
+        .pipe(gulp.dest('app/js'));
 });
 
 gulp.task('copy-block', function() {
     return gulp.src('src/.block')
-        .pipe(gulp.dest('out'));
+        .pipe(gulp.dest('dist'));
 });
 
-gulp.task('bundle', ['inline-css', 'modernizr', 'browserify', 'copy-block'], function() {
-    return gulp.src('out/index.html')
-        .pipe(inlinesource({compress: false}))
+gulp.task('bundle', ['inline-css', 'modernizr', 'concat-libs', 'browserify', 'copy-block'], function() {
+    return gulp.src('app/index.html')
+        .pipe(inlinesource({
+            compress: false
+        }))
         .pipe(gulp.dest('dist'))
         .pipe(htmlmin({
             collapseWhitespace: true,
