@@ -3,58 +3,11 @@
 
     var Modernizr = require('modernizr');
     var SuperGif = require('supergif');
+    var Giphy = require('giphy');
 
-    function getJSON(url, func) {
-        var request = new XMLHttpRequest();
-        request.addEventListener('load',
-            function() {
-                if (request.status >= 200 && request.status < 400) {
-                    var data = JSON.parse(request.responseText);
-                    func(data);
-                } else {
-                    setTimeout(
-                        function() {
-                            getJSON(url, func);
-                        },
-                        1000);
-                }
-            });
-        request.addEventListener('error',
-            function() {
-                setTimeout(
-                    function() {
-                        getJSON(url, func);
-                    },
-                    1000);
-            });
-        request.open('GET', url, true);
-        request.send();
-    }
-
-    function giphyMP4(func) {
-        getJSON('http://api.giphy.com/v1/gifs/random?api_key=' + giphy_api_key + '&tag=' + giphy_search_term,
-            function(result) {
-                getJSON('http://api.giphy.com/v1/gifs/' + result.data.id + '?api_key=' + giphy_api_key,
-                    function(result) {
-                        func(result.data.images.fixed_height.mp4);
-                    });
-            });
-    }
-
-    function giphyGIF(func) {
-        getJSON('http://api.giphy.com/v1/gifs/random?api_key=' + giphy_api_key + '&tag=' + giphy_search_term,
-            function(result) {
-                getJSON('http://api.giphy.com/v1/gifs/' + result.data.id + '?api_key=' + giphy_api_key,
-                    function(result) {
-                        func(result.data.images.fixed_height.url);
-                    });
-            });
-    }
-
+    var giphy_search_term = 'cats';
     var cache_size = 5;
     var cats = [];
-    var giphy_api_key = 'dc6zaTOxFJmzC';
-    var giphy_search_term = 'cats';
 
     function startVideo(giphy) {
         for (var i = 0; i < cache_size; i++) {
@@ -74,12 +27,11 @@
                     cur_cat = cats.indexOf(available_cat);
                     available_cat.element.play();
                     available_cat.element.style.display = 'block';
-                    available_cat.element.onended =
-                        function() {
-                            if (cur_cat !== -1) {
-                                switch_cat(cur_cat);
-                            }
-                        };
+                    available_cat.element.onended = function() {
+                        if (cur_cat !== -1) {
+                            switch_cat(cur_cat);
+                        }
+                    };
                 } else {
                     setInterval(play, 100);
                 }
@@ -94,10 +46,9 @@
             giphy(function(url) {
                 cats[i].element.src = url;
                 cats[i].element.load();
-                cats[i].element.oncanplaythrough =
-                    function() {
-                        cats[i].loaded = true;
-                    };
+                cats[i].element.oncanplaythrough = function() {
+                    cats[i].loaded = true;
+                };
                 cats[i].element.onclick = play;
             });
             play();
@@ -112,7 +63,7 @@
 
     function initVideo(giphy, start) {
         function init() {
-            giphy(function(url) {
+            giphy(giphy_search_term, function(url) {
                 var i = cats.length;
 
                 cats.push({
@@ -135,22 +86,19 @@
                     }
                 }
 
-                videoElement.oncontextmenu =
-                    function() {
-                        return false;
-                    };
+                videoElement.oncontextmenu = function() {
+                    return false;
+                };
 
-                videoElement.oncanplaythrough =
-                    function() {
-                        cats[i].loaded = true;
-                        if (cats.length === cache_size &&
-                            cats.every(
-                                function(cat) {
-                                    return cat.loaded;
-                                })) {
-                            start(giphy);
-                        }
-                    };
+                videoElement.oncanplaythrough = function() {
+                    cats[i].loaded = true;
+                    if (cats.length === cache_size && cats.every(
+                        function(cat) {
+                            return cat.loaded;
+                        })) {
+                        start(giphy);
+                    }
+                };
 
                 document.getElementById('cats').appendChild(videoElement);
                 document.getElementById('cat' + i).style.display = 'none';
@@ -174,8 +122,9 @@
                 Modernizr.on('videoautoplay',
                     function(videoautoplay) {
                         if (videoautoplay) {
-                            if (false) { //Modernizr.video.h264) {
-                                initVideo(giphyMP4, startVideo);
+                            // if (false) {
+                            if (Modernizr.video.h264) {
+                                initVideo(Giphy.getMP4, startVideo);
                             } else {
                                 console.log('Not implemented');
                             }

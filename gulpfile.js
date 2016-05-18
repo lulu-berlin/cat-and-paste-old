@@ -10,6 +10,7 @@ var browserify = require('browserify');
 var source = require('vinyl-source-stream');
 var inlinesource = require('gulp-inline-source');
 var htmlmin = require('gulp-htmlmin');
+var uglify = require('gulp-uglify');
 
 gulp.task('lint', function() {
     return gulp.src('src/*.js')
@@ -36,11 +37,16 @@ gulp.task('modernizr', function() {
 gulp.task('concat-libs', function() {
     return gulp.src('lib/*.js')
         .pipe(concat('libs.js'))
+        .pipe(gulp.dest('app/js'))
+        .pipe(uglify())
         .pipe(gulp.dest('app/js'));
 });
 
 gulp.task('browserify', function() {
-    return browserify('src/main.js')
+    return browserify({
+            entries: ['./src/main.js'],
+            paths: ['./src/']
+        })
         .bundle()
         .pipe(source('main.js'))
         .pipe(gulp.dest('app/js'));
