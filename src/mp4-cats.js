@@ -6,38 +6,46 @@ module.exports = function(searchTerm, cacheSize) {
     var cats = [];
 
     function startVideo() {
+        var currentCat = -1;
+
         for (var i = 0; i < cacheSize; i++) {
             cats[i].element = document.getElementById('cat' + i);
         }
 
-        var cur_cat = -1;
-
         function play() {
-            if (cur_cat === -1) {
-                var availableCat =
-                    cats.find(function(cat) {
-                        return cat.loaded;
-                    });
+            if (currentCat !== -1) {
+                return;
+            }
 
-                if (availableCat) {
-                    cur_cat = cats.indexOf(availableCat);
+            var availableCat =
+                cats.find(function(cat) {
+                    return cat.loaded;
+                });
+
+            if (availableCat) {
+                currentCat = cats.indexOf(availableCat);
+                availableCat.element.play();
+                window.onfocus = function() {
                     availableCat.element.play();
-                    availableCat.element.style.display = 'block';
-                    availableCat.element.onended = function() {
-                        if (cur_cat !== -1) {
-                            switchCat(cur_cat);
-                        }
-                    };
-                } else {
-                    setInterval(play, 100);
-                }
+                };
+                window.onblur = function() {
+                    availableCat.element.pause();
+                };
+                availableCat.element.style.display = 'block';
+                availableCat.element.onended = function() {
+                    if (currentCat !== -1) {
+                        switchCat(currentCat);
+                    }
+                };
+            } else {
+                setInterval(play, 100);
             }
         }
 
         function switchCat(i) {
             cats[i].element.style.display = 'none';
             cats[i].loaded = false;
-            cur_cat = -1;
+            currentCat = -1;
 
             giphy.getMP4(searchTerm, function(url) {
                 cats[i].element.src = url;
