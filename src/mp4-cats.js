@@ -5,11 +5,14 @@ module.exports = function(searchTerm, cacheSize) {
 
     var cats = [];
 
+    // helping out the uglifier
+    var getElementById = document.getElementById.bind(document);
+
     function startVideo() {
         var currentCat = -1;
 
         for (var i = 0; i < cacheSize; i++) {
-            cats[i].element = document.getElementById('cat' + i);
+            cats[i].element = getElementById('cat' + i);
         }
 
         function play() {
@@ -23,6 +26,7 @@ module.exports = function(searchTerm, cacheSize) {
                 });
 
             if (availableCat) {
+                window.focus();
                 currentCat = cats.indexOf(availableCat);
                 availableCat.element.play();
                 window.onfocus = function() {
@@ -58,7 +62,7 @@ module.exports = function(searchTerm, cacheSize) {
             play();
         }
 
-        var staticCat = document.getElementById('static-cat');
+        var staticCat = getElementById('static-cat');
         staticCat.parentNode.removeChild(staticCat);
 
         play();
@@ -66,7 +70,7 @@ module.exports = function(searchTerm, cacheSize) {
 
     function init() {
         giphy.getMP4(searchTerm, function(url) {
-            var i = cats.length;
+            var catIndex = cats.length;
 
             cats.push({
                 loaded: false
@@ -74,17 +78,18 @@ module.exports = function(searchTerm, cacheSize) {
 
             var videoElement = document.createElement('video');
 
-            videoElement.setAttribute('id', 'cat' + i);
-            videoElement.setAttribute('src', url);
-            videoElement.setAttribute('type', 'video/mp4');
-            videoElement.setAttribute('style', document.getElementById('static-cat').getAttribute('style'));
+            ('id=cat' + catIndex + ',src=' + url + ',type=video/mp4,' + 'style=' +
+                getElementById('static-cat').getAttribute('style') + ';display:none')
+            .split(',').forEach(function(element) {
+                videoElement.setAttribute.apply(videoElement, element.split('='));
+            });
 
             videoElement.oncontextmenu = function() {
                 return false;
             };
 
             videoElement.oncanplaythrough = function() {
-                cats[i].loaded = true;
+                cats[catIndex].loaded = true;
                 if (cats.length === cacheSize && cats.every(
                     function(cat) {
                         return cat.loaded;
@@ -93,8 +98,7 @@ module.exports = function(searchTerm, cacheSize) {
                 }
             };
 
-            document.getElementById('cats').appendChild(videoElement);
-            document.getElementById('cat' + i).style.display = 'none';
+            getElementById('cats').appendChild(videoElement);
         });
     }
 

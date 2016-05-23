@@ -10,7 +10,8 @@ var browserify = require('browserify');
 var source = require('vinyl-source-stream');
 var inlinesource = require('gulp-inline-source');
 var htmlmin = require('gulp-htmlmin');
-var uglify = require('gulp-uglify');
+var beautify = require('gulp-beautify');
+var strip = require('gulp-strip-comments');
 
 gulp.task('lint', function() {
     return gulp.src('src/*.js')
@@ -37,8 +38,8 @@ gulp.task('modernizr', function() {
 gulp.task('concat-libs', function() {
     return gulp.src('lib/*.js')
         .pipe(concat('libs.js'))
-        .pipe(gulp.dest('app/js'))
-        .pipe(uglify())
+        .pipe(strip())
+        .pipe(beautify())
         .pipe(gulp.dest('app/js'));
 });
 
@@ -54,22 +55,27 @@ gulp.task('browserify', function() {
 
 gulp.task('copy-block', function() {
     return gulp.src('src/.block')
+        .pipe(gulp.dest('dist/release'));
+});
+
+gulp.task('inline-js', function() {
+    return gulp.src('app/index.html')
+        .pipe(inlinesource({
+            compress: false,
+            rootpath: 'app/'
+        }))
         .pipe(gulp.dest('dist'));
 });
 
-gulp.task('bundle', ['inline-css', 'modernizr', 'concat-libs', 'browserify', 'copy-block'], function() {
-    return gulp.src('app/index.html')
-        .pipe(inlinesource({
-            compress: false
-        }))
-        .pipe(gulp.dest('dist'))
+gulp.task('bundle', ['inline-css', 'modernizr', 'concat-libs', 'browserify', 'copy-block', 'inline-js'], function() {
+    return gulp.src('dist/index.html')
         .pipe(htmlmin({
             collapseWhitespace: true,
             collapseInlineTagWhitespace: true,
             minifyCSS: true,
             minifyJS: true
         }))
-        .pipe(gulp.dest('dist'));
+        .pipe(gulp.dest('dist/release'));
 });
 
 gulp.task('watch', function() {
