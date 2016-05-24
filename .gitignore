@@ -4,3 +4,5 @@ node_modules
 app
 dist
 lib/modernizr.js
+*.swm
+*.swn

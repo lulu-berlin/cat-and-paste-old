@@ -25,6 +25,7 @@ module.exports = function(searchTerm, cacheSize) {
                     return cat.loaded;
                 });
 
+
             if (availableCat) {
                 window.focus();
                 currentCat = cats.indexOf(availableCat);

@@ -17,13 +17,11 @@
             Modernizr.on('videoautoplay',
                 function(videoautoplay) {
                     if (videoautoplay) {
-                        // if (false) {
-                        if (Modernizr.video.h264) {
-                            var MP4Cats = require('mp4-cats');
-
-                            MP4Cats(searchTerm, cacheSize);
+                        if (false) {
+                        //if (Modernizr.video.h264) {
+                            require('mp4-cats')(searchTerm, cacheSize);
                         } else {
-                            console.log('Not implemented');
+                            require('html5-gif-cats')(searchTerm, cacheSize);
                         }
                     }
                 });
