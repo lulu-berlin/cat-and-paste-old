@@ -17,8 +17,8 @@
             Modernizr.on('videoautoplay',
                 function(videoautoplay) {
                     if (videoautoplay) {
-                        if (false) {
-                        //if (Modernizr.video.h264) {
+                        //if (false) {
+                        if (Modernizr.video.h264) {
                             require('mp4-cats')(searchTerm, cacheSize);
                         } else {
                             require('html5-gif-cats')(searchTerm, cacheSize);
