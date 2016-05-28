@@ -5,68 +5,59 @@ module.exports = function(searchTerm, cacheSize) {
 
     var cats = [];
 
+    var currentCat = -1;
+
     // helping out the uglifier
     var getElementById = document.getElementById.bind(document);
 
-    function startVideo() {
-        var currentCat = -1;
+    var staticCat = getElementById('static-cat');
+    var staticCatStyle = staticCat.getAttribute('style');
 
-        for (var i = 0; i < cacheSize; i++) {
-            cats[i].element = getElementById('cat' + i);
-        }
+    function switchCat(i) {
+        cats[i].element.style.display = 'none';
+        cats[i].loaded = false;
+        currentCat = -1;
 
-        function play() {
-            if (currentCat !== -1) {
-                return;
-            }
-
-            var availableCat =
-                cats.find(function(cat) {
-                    return cat.loaded;
-                });
-
-
-            if (availableCat) {
-                window.focus();
-                currentCat = cats.indexOf(availableCat);
-                availableCat.element.play();
-                window.onfocus = function() {
-                    availableCat.element.play();
-                };
-                window.onblur = function() {
-                    availableCat.element.pause();
-                };
-                availableCat.element.style.display = 'block';
-                availableCat.element.onended = function() {
-                    if (currentCat !== -1) {
-                        switchCat(currentCat);
-                    }
-                };
-            } else {
-                setInterval(play, 100);
-            }
-        }
-
-        function switchCat(i) {
-            cats[i].element.style.display = 'none';
-            cats[i].loaded = false;
-            currentCat = -1;
-
-            giphy.getMP4(searchTerm, function(url) {
-                cats[i].element.src = url;
-                cats[i].element.load();
-                cats[i].element.oncanplaythrough = function() {
-                    cats[i].loaded = true;
-                };
-                cats[i].element.onclick = play;
-            });
-            play();
-        }
-
-        var staticCat = getElementById('static-cat');
-        staticCat.parentNode.removeChild(staticCat);
-
+        giphy.getMP4(searchTerm, function(url) {
+            cats[i].element.src = url;
+            cats[i].element.load();
+            cats[i].element.oncanplaythrough = function() {
+                cats[i].loaded = true;
+            };
+            cats[i].element.onclick = play;
+        });
         play();
+    }
+
+    function play() {
+        if (currentCat !== -1) {
+            return;
+        }
+
+        var availableCat =
+            cats.find(function(cat) {
+                return cat.loaded;
+            });
+
+        if (availableCat) {
+            window.focus();
+            currentCat = cats.indexOf(availableCat);
+            availableCat.element.play();
+            window.onfocus = function() {
+                availableCat.element.play();
+            };
+            window.onblur = function() {
+                availableCat.element.pause();
+            };
+            availableCat.element.style.display = 'block';
+            availableCat.element.onended = function() {
+                if (currentCat !== -1) {
+                    switchCat(currentCat);
+                }
+            };
+        } else {
+            setInterval(play, 100);
+        }
     }
 
     function init() {
@@ -79,10 +70,14 @@ module.exports = function(searchTerm, cacheSize) {
 
             var videoElement = document.createElement('video');
 
-            ('id=cat' + catIndex + ',src=' + url + ',type=video/mp4,' + 'style=' +
-                getElementById('static-cat').getAttribute('style') + ';display:none')
-            .split(',').forEach(function(element) {
-                videoElement.setAttribute.apply(videoElement, element.split('='));
+            [
+                ['id', 'cat' + catIndex],
+                ['src', url],
+                ['type', 'video/mp4'],
+                ['style', staticCatStyle + ';display:none']
+            ]
+            .forEach(function(pair) {
+                videoElement.setAttribute.apply(videoElement, pair);
             });
 
             videoElement.oncontextmenu = function() {
@@ -91,11 +86,14 @@ module.exports = function(searchTerm, cacheSize) {
 
             videoElement.oncanplaythrough = function() {
                 cats[catIndex].loaded = true;
-                if (cats.length === cacheSize && cats.every(
-                    function(cat) {
-                        return cat.loaded;
-                    })) {
-                    startVideo();
+                if (cats.length === cacheSize && cats.every(function(cat) {
+                    return cat.loaded;
+                })) {
+                    for (var i = 0; i < cacheSize; i++) {
+                        cats[i].element = getElementById('cat' + i);
+                    }
+                    staticCat.parentNode.removeChild(staticCat);
+                    play();
                 }
             };
 
@@ -106,4 +104,5 @@ module.exports = function(searchTerm, cacheSize) {
     for (var i = 0; i < cacheSize; i++) {
         init();
     }
+
 };
